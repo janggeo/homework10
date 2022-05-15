@@ -190,7 +190,7 @@ int insert(Node* head, int key){
 	Node* ptr=head->left;	//tree위를 옮겨다니며 탐색할 포인터
 	Node* parentNode=NULL;	//ptr의 parentNode를 가리킬 포인터
 
-	while(ptr !=NULL){
+	while(ptr !=NULL){//새로운 노드의 parentNode 구하기
 		/*tree에 이미 key 값을 가지는 노드가 있을경우*/
 		if(ptr->key ==key)return 1;	
 
@@ -213,6 +213,126 @@ int insert(Node* head, int key){
 	return 1;
 }
 
+int deleteNode(Node* head, int key){
+	/*root를 가리키는 head가 없거나 root노드가 없을경우*/
+	if(head == NULL){
+		printf("\n Nothing to delete!!\n");
+		return -1;
+	}
+	if(head->left ==NULL){
+		printf("\n Nothing to delete!!\n");
+		return -1;
+	}
+	/*head->left is the root*/
+	Node* root =head->left;
+
+	Node* parent =NULL;
+	Node* ptr =root;
+
+	/*삭제할 ptr구하기*/
+	while((ptr != NULL)&&(ptr->key !=key)){//key값을 가지는 노드를 찾거나 전부 탐색할동안 반복
+		if(ptr->key !=key){
+			parent = ptr;	/*save the parent*/
+			if(ptr->key > key)	/*왼쪽자식이 더 작은 key 값을 가짐*/
+				ptr=ptr->left;
+			else
+				ptr=ptr->right;	/*오른쪽 자식이 더 큰 key 값을 가짐*/
+		}
+	}
+	/*못찾은 경우*/
+	if(ptr ==NULL)
+	{
+		printf("No node for key [%d]\n",key);
+		return -1;
+	}
+
+	/*찾은 경우*/
+	/*
+	 * case 1: the node which has to be removed is a leaf node
+	 */
+	if(ptr->left==NULL && ptr->right ==NULL)
+	{
+		if(parent != NULL){
+			if(parent->left ==ptr)	/*ptr이 parent의 왼쪽 자식*/
+				parent->left=NULL;	/*NULL로 수정*/
+			else					/*ptr이 parent의 오른쪽 자식*/
+				parent->right=NULL;	/*NULL로 수정*/
+		}
+		else{/*ptr이 root 노드 인경우*/
+			head->left =NULL;
+		}
+	free(ptr)
+	return 1;
+	}
+	/**
+	 * case 2: if the node to be deleted has one child
+	 */
+	if((ptr->left==NULL || ptr->right ==NULL))
+	{
+		Node* child;
+		/*ptr의 자식과 parent를 연결하기위해 child에 저장*/
+		if(ptr->left != NULL)
+			child=ptr->left;
+		else
+			child=ptr->right;
+		
+		if(parent != NULL)
+		{	
+			/*ptr을 제외하고 연결*/
+			if(parent->left == ptr)
+				parent->left =child;
+			else
+				parent->right =child;
+		}
+		else{/*parent가 NULL, ptr이 root노드 */
+			root = child;
+		}
+		free(ptr);
+		return 1;
+	}
+	/**
+	 * case 3: the node (ptr) has two children
+	 *
+	 * we have to find either the biggest descendant node in the left subtree of the ptr
+	 * or the smallest descendant in the right subtree of the ptr.
+	 *
+	 * we will find the smallest descendant from the right subtree of the ptr.
+	 *
+	 */
+	/*ptr이 왼쪽자식 오른쪽 자식 모두 가질경우.
+		ptr을 대체할 노드를 찾아야한다.
+		두가지 경우가 존재 
+		1)ptr의 왼쪽 subtree에서 가장 큰값
+		2)ptr의 오른쪽 subtree에서 가장 작은값
+		2)을 사용하여 ptr의 대체노드를 찾는다.*/
+	Node* candidate;
+	parent = ptr;
+
+	candidate=ptr->right;
+
+	while(candidate->left != NULL)
+	{	/*제일 작은 노드를 찾기*/
+		parent=candidate;
+		candidate=candidate->left;
+	}
+	/* the candidate node is the right node which has to be deleted.
+	 * note that candidate's left is null
+	 */
+	/*candidate를 제외하고 연결*/
+	if(parent->right == candidate)
+		parent->right =candidate->right;
+	else
+		parent->left=candidate->right;
+	
+	/*ptr의 key 값을 candidate의 key 값으로 대체하고, candidate를 해제*/
+	ptr->key=candidate->key;
+	free(candidate);
+	return 1;
+	
+
+
+	
+}
 Node* pop()
 {
 	if(top<0) return NULL;
