@@ -175,6 +175,44 @@ void levelOrder(Node* ptr)
 	}
 }
 
+int insert(Node* head, int key){
+	/*tree에 새로추가할 노드 동적할당 및 초기화*/
+	Node* newNode=(Node*)malloc(sizeof(Node));
+	newNode->key=key;
+	newNode->left=NULL;
+	newNode->right=NULL;
+	/*tree가 비어있을 경우*/
+	if(head->left==NULL){
+		head->left=newNode;	//새로운 노드를 root로 
+		return 1;
+	}
+
+	Node* ptr=head->left;	//tree위를 옮겨다니며 탐색할 포인터
+	Node* parentNode=NULL;	//ptr의 parentNode를 가리킬 포인터
+
+	while(ptr !=NULL){
+		/*tree에 이미 key 값을 가지는 노드가 있을경우*/
+		if(ptr->key ==key)return 1;	
+
+		/*parentNode를 통해 ptr의 부모노드 참고*/
+		parentNode=ptr;
+
+		/*ptr의 key값이 새로운 노드의 key보다 작은경우 */
+		if(ptr->key <key)
+			ptr=ptr->right;	//가리키는 노드보다 큰값은 노드의 오른쪽 subtree으로 들어간다
+		else
+			ptr=ptr->left;	//가리키는 노드보다 작은값은 노드의 왼쪽 subtree로 들어간다
+	}
+	/*key값이 parentNode의 key보다 작으므로 왼쪽 자식으로 들어간다*/
+	if(parentNode->key > key)
+		parentNode->left=newNode;
+	/*key값이 parentNode의 key보다 크기때문에 오른쪽 자식으로 들어간다*/
+	else
+		parentNode->right=newNode;
+	
+	return 1;
+}
+
 Node* pop()
 {
 	if(top<0) return NULL;
