@@ -14,7 +14,7 @@ typedef struct node{	//tree의 노드를 구성
 }Node;
 
 /*for stack*/
-#define MAX_STACK_SIZE	20
+#define MAX_STACK_SIZE	20	/*stack 사이즈*/
 Node* stack[MAX_STACK_SIZE];
 int top=-1;
 
@@ -22,22 +22,22 @@ Node* pop();	//stack에서 top이 가리키는 노드반환
 void push(Node* aNode);	//aNode를 stack에 추가
 
 /*for queue*/
-#define MAX_QUEUE_SIZE	20
+#define MAX_QUEUE_SIZE	20	/*queue 사이즈*/
 Node* queue[MAX_QUEUE_SIZE];
 int front =-1;
 int rear=-1;
 
-Node* deQueue();
+Node* deQueue();		//queue에서 front가 가리키는 노드 리턴
 void enQueue(Node* aNode);	//circular queue에 Node를 추가
 
 int initializeBST(Node** h);	//tree를 초기화
 
 void recursiveInorder(Node* ptr);	//recursive inorder 방식 tree출력
 void iterativeInorder(Node* ptr);	//iterative inorder 방식tree출력
-int freeBST(Node* head);
-int insert(Node* head, int key);
-int deleteNode(Node* head, int key);
-void levelOrder(Node* ptr);
+int freeBST(Node* head);			//tree 초기화
+int insert(Node* head, int key);	//tree node 추가
+int deleteNode(Node* head, int key);	//tree에서 해당 key값을 가지는 node 제거
+void levelOrder(Node* ptr);			//queue를 이용해 child보다 sibling을 먼저 방문
 
 /*void printStack();	//stack 출력*/
 
@@ -174,7 +174,7 @@ void levelOrder(Node* ptr)
 
 	enQueue(ptr);	//queue에 추가 
 
-	/*queue를 이용해 childe보다 sibling을 먼저 방문*/
+	/*queue를 이용해 child보다 sibling을 먼저 방문*/
 	for(;;)
 	{
 		ptr=deQueue();	/*먼저 넣은 Node 꺼낸다*/
