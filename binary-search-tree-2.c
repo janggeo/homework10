@@ -1,8 +1,9 @@
 /*[2021076029] [장정환]
 	수정사항
-		1)stack의 MAXSize를 초과할경우? 예외처리?
+		1)stack의 MAXSize를 초과할경우, 메시지 출력하고 returbn
 		2)intialize를 먼저 할 필요없게 main에서 head동적할당
-		 */
+		3)freeBST함수 수정. tree에 head노드만 존재할 경우 head노드의 왼쪽 자식은 NULL,
+			head->left == NULL로 변경*/
 #include<stdio.h>
 #include<stdlib.h>	//malloc, free
 
@@ -33,8 +34,12 @@ int initializeBST(Node** h);	//tree를 초기화
 
 void recursiveInorder(Node* ptr);	//recursive inorder 방식 tree출력
 void iterativeInorder(Node* ptr);	//iterative inorder 방식tree출력
+int freeBST(Node* head);
+int insert(Node* head, int key);
+int deleteNode(Node* head, int key);
+void levelOrder(Node* ptr);
 
-void printStack();	//stack 출력
+/*void printStack();	//stack 출력*/
 
 int main()
 {
@@ -60,49 +65,60 @@ int main()
 
 		printf("Command = ");
 		scanf("%c",&command);
+		getchar();
 
 		switch(command){
 			//tree초기화 (head를 간접참조로 바꾸기위해 주소를 넘겨준다)
-		case 'z': case 'Z':
+		case 'z': case 'Z':{
 			initializeBST(&head);
 			break;
+		}
 		//tree의 동적할당 해제
-		case 'q': case 'Q':
+		case 'q': case 'Q':{
 			freeBST(head);		
 			break;
+		}	
 		//입력받은 key값을 갖는 노드 tree에 추가
-		case 'i': case 'I':
+		case 'i': case 'I':{
 			printf("Your Key = ");
 			scanf("%d", &key);
+			getchar();// 버퍼비우기
 			insert(head, key);		
 			break;
+		}
 		//입력받은 key값을 가지는 노드가 있을경우 tree에서 제거
-		case 'd': case 'D':
+		case 'd': case 'D':{
 			printf("Your Key = ");
 			scanf("%d", &key);
+			getchar();
 			deleteNode(head, key);
 			break;
+		}
 		//recursive Inorder 방식으로 tree출력
-		case 'r': case 'R':
+		case 'r': case 'R':{
 			recursiveInorder(head->left);
 			break;
+		}
 		//itearative Inorder 방식을 tree출력
-		case 't': case 'T':
+		case 't': case 'T':{
 			iterativeInorder(head->left);
 			break;
+		}
 		//levelOrder 방식으로 tree출력
-		case 'l': case 'L':
+		case 'l': case 'L':{
 			levelOrder(head->left);
 			break;
+		}
 		//stack출력
-		case 'p': case 'P':
+		/*case 'p': case 'P':{
 			printStack();
 			break;
-
-		default:
+		}*/
+		default:{
 			printf("\n      >>>>>   Concentration!!   <<<<<    \n");
 			break;
 		}
+	}
 
 	}while(command != 'q' && command != 'Q');
 
@@ -261,7 +277,7 @@ int deleteNode(Node* head, int key){
 		else{/*ptr이 root 노드 인경우*/
 			head->left =NULL;
 		}
-	free(ptr)
+	free(ptr);
 	return 1;
 	}
 	/**
@@ -328,47 +344,77 @@ int deleteNode(Node* head, int key){
 	ptr->key=candidate->key;
 	free(candidate);
 	return 1;
-	
-
-
-	
 }
-Node* pop()
+void freeNode(Node* ptr)
 {
+	if(ptr){/*재귀적 호출로 tree의 Node 해제*/
+		freeNode(ptr->left);
+		freeNode(ptr->right);
+		free(ptr);
+		ptr=NULL;
+	}
+}
+
+Node* pop()
+{	/*top<0인경우 stack은 비어있는상태*/
 	if(top<0) return NULL;
-	return stak[top--];
+	return stack[top--];
 }
 
 void push(Node* aNode)
-{
-	++check;
+{	
+	if(top>=MAX_STACK_SIZE){
+		printf("Queue가 가득찼습니다");
+		return;
+	}
+	/*stack에 추가전 top을 증가시켜준다*/
 	stack[++top]=aNode;
 }
-void printStack()
+
+/*void printStack()
 {
 	int i = 0;
-	printf("%d",check);
 	printf("--- stack ---\n");
-	while(i <= check)
+	
 	{
 		printf("stack[%d] = %d\n", i, stack[i]->key);
 		i++;
 	}
-}
+}*/
+
 int freeBST(Node* head)
 {
-	/*head->right로 수정*/
-	if(head->left == head)
+	/*tree에 head노드만 존재할경우*/
+	if(head->left == NULL)
 	{
 		free(head);
 		return 1;
 	}
-
+	/*p는 root노드 */
 	Node* p = head->left;
-
+	/*root노드를 넘겨줘서 tree를 전부 해제*/
 	freeNode(p);
-
+	/*head노드 해제*/
 	free(head);
 	return 1;
 }
 
+Node* deQueue()
+{	/*queue가 비어있는 경우*/
+	if(front==rear){
+		return NULL;
+	}
+	/*front 위치 조정*/
+	front=(front+1)% MAX_QUEUE_SIZE;
+	return queue[front];
+}
+
+void enQueue(Node* aNode)
+{	/*rear위치 조정*/
+	rear=(rear+1)%MAX_QUEUE_SIZE;
+	if(front == rear){
+		return;
+	}
+	/*노드 삽입*/
+	queue[rear]=aNode;
+}
